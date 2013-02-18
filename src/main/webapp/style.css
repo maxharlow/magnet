@@ -1,0 +1,52 @@
+
+
+body {
+    margin: 0;
+    color: #333;
+    font: 20px georgia, serif;
+}
+header {
+    padding: 0 10px;
+    color: white;
+    background: #214583;
+    font-family: 'EgyptianText';
+    font-size: 40px;
+}
+form {
+    padding: 10px 0;
+}
+form * {
+    height: 30px;
+    margin: 0 5px;
+    padding: 0 5px;
+}
+input, button {
+    width: 200px;
+    border: none;
+    background: inherit;
+    color: inherit;
+    font: inherit;
+}
+input {
+    border: 2px dotted white;
+}
+h2 {
+    font-size: 25px;
+}
+a:link {
+    color: darkgreen;
+}
+a:visited {
+    color: #ccc;
+}
+ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+li {
+    padding: 10px;
+}
+li + li {
+    border-top: 1px solid #777;
+}
