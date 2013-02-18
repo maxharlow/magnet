@@ -30,6 +30,9 @@ function Magnet() {
             html += '<img src = "' + result.thumbnailUri + '"/>';
         }
         html += '<h2>' + result.headline + '</h2>';
+        for (var i = 0; i < result.thingUris.length; i++) {
+            html += '<span>' + result.thingUris[i].name + '</span>';
+        }
         html += '</a>';
         resultItem.innerHTML = html;
         document.querySelector('.results').appendChild(resultItem);

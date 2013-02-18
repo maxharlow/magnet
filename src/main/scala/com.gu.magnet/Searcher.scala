@@ -4,19 +4,20 @@ import dispatch._
 import net.liftweb.json._
 import net.liftweb.json.Serialization.write
 
-object Magnetiser {
+object Searcher {
 
   case class MagnetResponse(content: List[Content])
-  case class Content(uri: String, headline: String, thumbnailUri: Option[String], body: String)
+  case class Content(uri: String, headline: String, thumbnailUri: Option[String], body: String, thingUris: List[Thing])
+  case class Thing(name: String, image: Option[String] = None)
 
   def guardianContent = host("content.guardianapis.com")
   def triplestore = url("http://localhost:8000/")
 
   val guardianContentApiKey = ""
 
-  def query(query: String) = {
+  def search(query: String) = {
     implicit val formats = Serialization.formats(NoTypeHints)
-    val contentUris = runQuery(query + " LIMIT 10")
+    val contentUris = runQuery(query + " LIMIT 25")
     val response = contentUris map retrieveContent
     write(response)
   }
@@ -48,7 +49,18 @@ object Magnetiser {
       case _ => None
     }
     val body = (json \\ "body").extract[String]
-    Content(uri, headline, thumbnailUri, body)
+    val things = getThingsFor(body)
+    Content(uri, headline, thumbnailUri, body, things)
+  }
+
+  lazy val countries = List( "Mauritania", "Somaliland", "Palestinian  territories", "Northland  State", "Morocco", "Algeria", "Saudi  Arabia", "Bahrain", "Djibouti", "United  Arab  Emirates", "Eritrea", "Tunisia", "Somalia", "Puntland", "Jubaland", "Moh%C3%A9li", "Anjouan", "Yemen  Arab  Republic", "Maakhir", "Nineveh  plains", "E-Government  in  the  United  Arab  Emirates", "Egypt", "Yemen", "Iraq", "Qatar", "Libya", "Palestinian  National  Authority", "Syria", "Chad", "Sudan", "Oman", "Southwestern  Somalia", "Grande  Comore", "Islamic  Courts  Union", "Abyei", "Sahrawi  Arab  Democratic  Republic", "State  of  Palestine", "Italian  Cyrenaica", "Israel", "Jordan", "Kuwait", "Darfur", "Iraq  under  U.S.  Military  Occupation", "Darfur  Regional  Authority", "Awdalland")
+
+  private def getThingsFor(body:String): List[Thing] = {
+   val countriesForBody = countries map { country =>
+      if (body.contains(country)) Some(Thing(country))
+      else None
+    }
+    countriesForBody.flatten
   }
 
 }
