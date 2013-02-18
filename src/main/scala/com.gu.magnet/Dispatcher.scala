@@ -1,11 +1,12 @@
 package com.gu.magnet
 
-import org.scalatra.ScalatraServlet
+import org.scalatra.{Ok, ScalatraServlet}
 
 class Dispatcher extends ScalatraServlet {
 
   get("/") {
-    "ok!"
+    Magnetiser.query()
+    Ok()
   }
 
 }
