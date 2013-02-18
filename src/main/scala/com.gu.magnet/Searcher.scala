@@ -17,9 +17,24 @@ object Searcher {
 
   def search(query: String) = {
     implicit val formats = Serialization.formats(NoTypeHints)
-    val contentUris = runQuery(query + " LIMIT 25")
+    val computedQuery = computeQuery(query)
+    val contentUris = runQuery(computedQuery + " LIMIT 25")
     val response = contentUris map retrieveContent
     write(response)
+  }
+
+  private def computeQuery(query: String) = {
+    val computedQuery = "SELECT DISTINCT ?article WHERE {" +
+      " { ?article <http://purl.org/dc/elements/1.1/subject> ?country }" +
+      " UNION" +
+      " { ?country <http://dbpedia.org/ontology/officialLanguage> <http://dbpedia.org/resource/Arabic_language> }" +
+      "}"
+//    val computedQuery2 = "SELECT DISTINCT ?article WHERE {" +
+//      " { ?article <http://purl.org/dc/elements/1.1/subject> ?person }" +
+//      " UNION" +
+//      " { ?person <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:People_educated_at_Eton_College> }" +
+//      "}"
+    computedQuery
   }
 
   private def runQuery(sparql: String): Set[String] = {
