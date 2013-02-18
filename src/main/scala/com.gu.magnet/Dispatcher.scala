@@ -1,6 +1,6 @@
 package com.gu.magnet
 
-import org.scalatra.{Ok, ScalatraServlet}
+import org.scalatra.{ScalatraServlet, Ok}
 
 class Dispatcher extends ScalatraServlet {
 
