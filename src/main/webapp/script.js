@@ -13,6 +13,7 @@ function Magnet() {
         queryReq.open('GET', runQueryUri);
         queryReq.onload = function (e) {
             if (this.status == 200) {
+                document.querySelector('.results').innerHTML = '';
                 var results = JSON.parse(this.response);
                 for (var i = 0; i < results.length; i++) {
                     addResult(results[i]);
