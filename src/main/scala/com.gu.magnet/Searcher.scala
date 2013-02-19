@@ -23,17 +23,31 @@ object Searcher {
     write(response)
   }
 
+  private var useCountries = false
+
   private def computeQuery(query: String) = {
-    val computedQuery = "SELECT DISTINCT ?article WHERE {" +
+    val computedQuery = if (query.contains("Arabic")) {
+      "SELECT DISTINCT ?article WHERE {" +
       " { ?article <http://purl.org/dc/elements/1.1/subject> ?country }" +
       " UNION" +
       " { ?country <http://dbpedia.org/ontology/officialLanguage> <http://dbpedia.org/resource/Arabic_language> }" +
       "}"
-//    val computedQuery2 = "SELECT DISTINCT ?article WHERE {" +
-//      " { ?article <http://purl.org/dc/elements/1.1/subject> ?person }" +
-//      " UNION" +
-//      " { ?person <http://purl.org/dc/terms/subject> <http://dbpedia.org/resource/Category:People_educated_at_Eton_College> }" +
-//      "}"
+    }
+    else {
+     "SELECT DISTINCT ?article WHERE {" +
+       "{ ?article <http://purl.org/dc/elements/1.1/subject> ?x }" +
+       " UNION" +
+       " { ?x <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://dbpedia.org/ontology/Actor> }" +
+       " UNION" +
+       "{ ?x <http://dbpedia.org/property/starring> ?film }" +
+       "  UNION" +
+       "{ ?film <http://dbpedia.org/ontology/director> <http://dbpedia.org/resource/Quentin_Tarantino> } }"
+    }
+    if (query.contains("Arabic")) {
+      useCountries = true
+    } else {
+      useCountries = false
+    }
     computedQuery
   }
 
@@ -64,11 +78,12 @@ object Searcher {
       case _ => None
     }
     val body = (json \\ "body").extract[String]
-    val things = getThingsFor(body)
+
+    val things = if (useCountries) getThingsFor(body) else List(Thing(""))
     Content(uri, headline, thumbnailUri, body, things)
   }
 
-  lazy val countries = List( "Mauritania", "Somaliland", "Palestinian  territories", "Northland  State", "Morocco", "Algeria", "Saudi  Arabia", "Bahrain", "Djibouti", "United  Arab  Emirates", "Eritrea", "Tunisia", "Somalia", "Puntland", "Jubaland", "Moh%C3%A9li", "Anjouan", "Yemen  Arab  Republic", "Maakhir", "Nineveh  plains", "E-Government  in  the  United  Arab  Emirates", "Egypt", "Yemen", "Iraq", "Qatar", "Libya", "Palestinian  National  Authority", "Syria", "Chad", "Sudan", "Oman", "Southwestern  Somalia", "Grande  Comore", "Islamic  Courts  Union", "Abyei", "Sahrawi  Arab  Democratic  Republic", "State  of  Palestine", "Italian  Cyrenaica", "Israel", "Jordan", "Kuwait", "Darfur", "Iraq  under  U.S.  Military  Occupation", "Darfur  Regional  Authority", "Awdalland")
+  lazy val countries = List("Mauritania", "Somaliland", "Palestinian  territories", "Northland  State", "Morocco", "Algeria", "Saudi  Arabia", "Bahrain", "Djibouti", "United  Arab  Emirates", "Eritrea", "Tunisia", "Somalia", "Puntland", "Jubaland", "Moh%C3%A9li", "Anjouan", "Yemen  Arab  Republic", "Maakhir", "Nineveh  plains", "E-Government  in  the  United  Arab  Emirates", "Egypt", "Yemen", "Iraq", "Qatar", "Libya", "Palestinian  National  Authority", "Syria", "Chad", "Sudan", "Oman", "Southwestern  Somalia", "Grande  Comore", "Islamic  Courts  Union", "Abyei", "Sahrawi  Arab  Democratic  Republic", "State  of  Palestine", "Italian  Cyrenaica", "Israel", "Jordan", "Kuwait", "Darfur", "Iraq  under  U.S.  Military  Occupation", "Darfur  Regional  Authority", "Awdalland")
 
   private def getThingsFor(body:String): List[Thing] = {
    val countriesForBody = countries map { country =>
