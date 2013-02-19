@@ -34,6 +34,9 @@ function Magnet() {
             html += '<span>' + result.thingUris[i].name + '</span>';
         }
         html += '</a>';
+        if (result.thingUris.length == 0) {
+            return; //smoke and mirrors
+        }
         resultItem.innerHTML = html;
         document.querySelector('.results').appendChild(resultItem);
     }
