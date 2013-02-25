@@ -44,4 +44,5 @@ function Magnet() {
 
     init();
 }
-Magnet();
+
+document.addEventListener('DOMContentLoaded', new Magnet());
